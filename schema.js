@@ -6,13 +6,15 @@ const { GraphQLObjectType, GraphQLSchema, GraphQLInt, GraphQLString, GraphQLList
 const BookType = new GraphQLObjectType({
 	name: 'Book',
 	description: '...',
+
 	fields: () => ({
 		title: {
 			type: GraphQLString,
-			resolve: (xml) => console.log('THE XML: ', xml)
+			resolve: (xml) => xml.title[0]
 		},
 		isbn: {
-			type: GraphQLString
+			type: GraphQLString,
+			resolve: (xml) => xml.isbn[0]
 		}
 	})
 });
@@ -28,9 +30,7 @@ const AuthorType = new GraphQLObjectType({
 		},
 		books: {
 			type: new GraphQLList(BookType),
-			resolve: (xml) => {
-				console.log('BOOKS: ', xml.GoodreadsResponse.author[0].books[0]);
-			}
+			resolve: (xml) => xml.GoodreadsResponse.author[0].books[0].book
 		}
 	})
 });
@@ -39,17 +39,17 @@ module.exports = new GraphQLSchema({
 	query: new GraphQLObjectType({
 		name: 'Query',
 		description: '...',
+
 		fields: () => ({
 			author: {
 				type: AuthorType,
 				args: {
 					id: { type: GraphQLInt }
 				},
-				resolve: (root, args) => {
+				resolve: (root, args) =>
 					fetch(`https://www.goodreads.com/author/show.xml?id=${args.id}&key=UFScpw1SBAOKEQ5vaBbOjg`)
 						.then((response) => response.text())
-						.then(parseXML);
-				}
+						.then(parseXML)
 			}
 		})
 	})
