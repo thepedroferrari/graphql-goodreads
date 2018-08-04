@@ -30,7 +30,16 @@ const AuthorType = new GraphQLObjectType({
 		},
 		books: {
 			type: new GraphQLList(BookType),
-			resolve: (xml) => xml.GoodreadsResponse.author[0].books[0].book
+			resolve: (xml) => {
+				const ids = xml.GoodreadsResponse.author[0].books[0].book.map((elem) => elem.id[0]._);
+				return Promise.all(
+					ids.map((id) =>
+						fetch(`https://www.goodreads.com/author/show.xml?id=${id}&key=UFScpw1SBAOKEQ5vaBbOjg`)
+							.then((response) => response.text())
+							.then(parseXML)
+					)
+				);
+			}
 		}
 	})
 });
