@@ -10,11 +10,11 @@ const BookType = new GraphQLObjectType({
 	fields: () => ({
 		title: {
 			type: GraphQLString,
-			resolve: (xml) => xml.title[0]
+			resolve: (xml) => xml.GoodreadsResponse.book[0].title[0]
 		},
 		isbn: {
 			type: GraphQLString,
-			resolve: (xml) => xml.isbn[0]
+			resolve: (xml) => xml.GoodreadsResponse.book[0].isbn[0]
 		}
 	})
 });
